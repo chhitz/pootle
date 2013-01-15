@@ -91,6 +91,11 @@ def get_supported_formats():
         formats.append(('ass', _('Subtitles: ass'), AdvSubStationAlphaFile, 'monolingual'))
     except ImportError:
         pass
+    try:
+        from translate.storage.aresource import AndroidResourceFile
+        formats.append(('xml', _('Android Resources'), AndroidResourceFile, 'monolingual'))
+    except ImportError:
+        pass
 
     return formats
 
