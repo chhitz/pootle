@@ -20,6 +20,10 @@ def precommit(commitfile, author, message):
 		return []
 	else:
 		pofile = os.path.join(settings.PODIRECTORY, commitfile)
+		try:
+			os.makedirs(os.path.join(settings.VCS_DIRECTORY, os.path.dirname(commitfile)))
+		except os.error:
+			pass
 		copyfile(pofile, os.path.join(settings.VCS_DIRECTORY, commitfile))
 		htmlfile = os.path.join(settings.PODIRECTORY, os.path.dirname(commitfile), 'help.html')
 		template = os.path.join(settings.VCS_DIRECTORY, commitfile.split('/')[0], 'de_DE/help.html')
