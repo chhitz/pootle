@@ -9,7 +9,7 @@ def initialize(projectdir, languagecode):
 
 def precommit(commitfile, author, message):
 	print "*************** precommit %s, %s, %s" % (commitfile, author, message)
-	if 'help.html' not in commitfile:
+	if not ('help.html' in commitfile or 'hint.html' in commitfile):
 		print 'commit to %s' % commitfile
 		return [commitfile]
 	elif '.pot' in commitfile:
@@ -19,14 +19,15 @@ def precommit(commitfile, author, message):
 		print 'ignore file'
 		return []
 	else:
+		originalFile = os.path.splitext(os.path.basename(commitfile))[0]
 		pofile = os.path.join(settings.PODIRECTORY, commitfile)
 		try:
 			os.makedirs(os.path.join(settings.VCS_DIRECTORY, os.path.dirname(commitfile)))
 		except os.error:
 			pass
 		copyfile(pofile, os.path.join(settings.VCS_DIRECTORY, commitfile))
-		htmlfile = os.path.join(settings.PODIRECTORY, os.path.dirname(commitfile), 'help.html')
-		template = os.path.join(settings.VCS_DIRECTORY, commitfile.split('/')[0], 'de_DE/help.html')
+		htmlfile = os.path.join(settings.PODIRECTORY, os.path.dirname(commitfile), originalFile)
+		template = os.path.join(settings.VCS_DIRECTORY, commitfile.split('/')[0], 'de_DE', originalFile)
 		print 'Converting po to html: %s to %s' % (pofile, htmlfile)
 		with open(pofile, 'r') as po, open(htmlfile, 'w') as html, open(template, 'r') as templ:
 			po2html.converthtml(po, html, templ)
@@ -38,8 +39,9 @@ def postcommit(updatedfile, success):
 
 def preupdate(updatedfile):
 	print "*************** preupdate %s" % updatedfile
-	if 'help.html.pot' in updatedfile:
-		htmlfile = os.path.join(updatedfile.split('/')[0], 'de_DE/help.html')
+	originalFile = os.path.splitext(os.path.basename(updatedfile))[0]
+	if '.html.pot' in updatedfile:
+		htmlfile = os.path.join(updatedfile.split('/')[0], 'de_DE', originalFile)
 		print 'rewrite to %s' % htmlfile
 		return htmlfile
 	else:
@@ -47,9 +49,10 @@ def preupdate(updatedfile):
 
 def postupdate(updatedfile):
         print "*************** postupdate %s" % updatedfile
-	if 'help.html.pot' in updatedfile:
+	originalFile = os.path.splitext(os.path.basename(updatedfile))[0]
+	if '.html.pot' in updatedfile:
 		potfile = os.path.join(settings.PODIRECTORY, updatedfile)
-		htmlfile = os.path.join(settings.VCS_DIRECTORY, updatedfile.split('/')[0], 'de_DE/help.html')
+		htmlfile = os.path.join(settings.VCS_DIRECTORY, updatedfile.split('/')[0], 'de_DE', originalFile)
 		print 'Converting de_DE html to pot: %s to %s' % (htmlfile, potfile)
 		with open(htmlfile, 'r') as html, open(potfile, 'w') as pot:
 			html2po.converthtml(html, pot, None, pot=True)
@@ -57,6 +60,6 @@ def postupdate(updatedfile):
 
 def pretemplateupdate(updatedfile):
 	print "*************** pretemplateupdate %s" % updatedfile
-	if 'de_DE' in updatedfile and 'help.html' in updatedfile:
+	if 'de_DE' in updatedfile and ('help.html' in updatedfile or 'hint.html' in updatedfile):
 		return False
 	return True
