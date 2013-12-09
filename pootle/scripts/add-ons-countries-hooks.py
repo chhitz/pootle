@@ -23,6 +23,7 @@ def precommit(commitfile, author, message):
 		pofile = os.path.join(settings.PODIRECTORY, commitfile)
 		try:
 			os.makedirs(os.path.join(settings.VCS_DIRECTORY, os.path.dirname(commitfile)))
+			os.makedirs(os.path.join(settings.PODIRECTORY, os.path.dirname(commitfile), 'LC_MESSAGES'))
 		except os.error:
 			pass
 		copyfile(pofile, os.path.join(settings.VCS_DIRECTORY, commitfile))
