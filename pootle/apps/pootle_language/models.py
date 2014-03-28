@@ -56,7 +56,6 @@ class LiveLanguageManager(models.Manager):
         return super(LiveLanguageManager, self).get_query_set().filter(
                 ~models.Q(code='templates'),
                 translationproject__isnull=False,
-                project__isnull=True,
             ).distinct()
 
 
